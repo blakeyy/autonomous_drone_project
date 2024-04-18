@@ -1,0 +1,73 @@
+<?xml version="1.0"?>
+<!-- Provided by sleutene for convenience -->
+<launch>
+  <!-- Launch simulator. -->
+  <!-- We resume the logic in empty_world.launch, changing only the name of the world to be launched -->
+  <include file="$(find sjtu_drone)/launch/simple.launch">
+    <arg name="world_name" value="$(find sjtu_drone)/worlds/skokloster_castle.world"/>
+    <!--arg name="world_name" value="$(find sjtu_drone)/worlds/garching_kitchen.world"/-->
+  </include>
+  
+  <!-- Emulate controller parameters-->
+  <group ns="ardrone_driver">
+    <!-- limits -->
+    <param name="euler_angle_max" value="0.21" />
+    <param name="control_vz_max" value="700" />
+    <param name="control_yaw" value="1.75" />
+    <!-- controller parameters -->
+    <param name="pid_xy_kp" value="0.27" /> 
+    <param name="pid_xy_ki" value="0.02" />
+    <param name="pid_xy_kd" value="0.06" /> 
+    <param name="pid_z_kp" value="2.0" />
+    <param name="pid_z_ki" value="0.02" />
+    <param name="pid_z_kd" value="0.2" />
+    <param name="pid_yaw_kp" value="1.25" />
+    <param name="pid_yaw_ki" value="0.01" />
+    <param name="pid_yaw_kd" value="0.2" />
+  </group>
+  
+  <!-- Launch visualisation. -->
+  <!-- Launch estimator / control arp_node. -->
+  <node name="arp_node" pkg="ardrone_practicals" type="arp_node"
+      output="screen">
+    <remap from="ardrone/front/image_raw" to="drone/front_camera/image_raw"/>
+    <remap from="ardrone/imu" to="drone/imu"/> 
+    <remap from="ardrone/takeoff" to="drone/takeoff"/> 
+    <remap from="ardrone/reset" to="drone/reset"/>
+    <remap from="ardrone/land" to="drone/land"/> 
+    <remap from="ardrone/navdata" to="drone/navdata"/> 
+    <!-- Frontend parameters -->
+    <param name="min_matches" value="10" />
+    <param name="max_bow_results" value="50" />
+    <!-- Camera parameters-->
+    <param name="map_camera_focal_length" value="185.6909" />
+    <param name="image_width" value="640" />
+    <param name="image_height" value="360" />
+    <param name="fu" value="185.6909" />
+    <param name="fv" value="185.6909" />
+    <param name="cu" value="319.5" />
+    <param name="cv" value="179." />
+    <param name="k1" value="0" />
+    <param name="k2" value="0" />
+    <param name="p1" value="0" />
+    <param name="p2" value="0" />
+    <rosparam param="T_SC">[0.0, 0.0, 1.0, 0.2, -1.0, 0.0, 0.0, 0.0, 0.0, -1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0]</rosparam>
+    <!-- BRISK detector parameters -->
+    <param name="uniformity_radius" value="35" />
+    <param name="octaves" value="5" />
+    <param name="absolute_threshold" value="70" />
+    <param name="max_num_kpt" value="1000" />
+    <!-- Make sure to match the map to the world loaded above! -->
+    <param name="map" value="okvis2-slam-final_map_skokloster.csv" />
+    <!--param name="map" value="okvis2-slam-final_map_garching.csv" /-->
+    <param name="occupancymap" value="occupancy-map_skokloster.dat" />
+    <!--param name="occupancymap" value="occupancy-map_garching.dat" /-->
+    <!-- point B position -->
+    <rosparam param="pointB">[0.0, 9.0, 1.0]</rosparam>
+
+    <param name="inflation" value="10" />
+    <param name="occ_thr" value="-3" />
+  </node>
+  <node pkg="rviz" type="rviz" name="rviz" args="-d $(find ardrone_practicals)/config/rviz_vi_ekf.rviz"/>
+
+</launch>

@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<!-- Provided by sleutene for convenience -->
+<launch>
+  <!-- IPv4 address of your drone -->
+  <arg name="ip" default="192.168.1.1" />
+  <!-- Ultrasound frequency (7 or 8). -->
+  <arg name="freq" default="8" />
+
+  <node pkg="rosbag" type="play" name="player" output="screen" cwd="node" args="--clock $(env PWD)/src/ardrone_practicals_2022/bags/calibration_sequence_chessboard.bag"/>
+
+  <!-- Launch estimator / control arp_node. -->
+  <node name="arp_node" pkg="ardrone_practicals" type="arp_node" output="screen">
+    <!-- Camera parameters-->
+    <param name="image_width" value="640" />
+    <param name="image_height" value="360" />
+    <param name="fu" value="582.055426" />
+    <param name="fv" value="579.306311" />
+    <param name="cu" value="316.003794" />
+    <param name="cv" value="205.449078" />
+    <param name="k1" value="-0.563630" />
+    <param name="k2" value="0.361622" />
+    <param name="p1" value="-0.011630" />
+    <param name="p2" value="-0.001178" />
+  </node>
+</launch>
